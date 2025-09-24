@@ -1,0 +1,24 @@
+
+spring:
+  datasource:
+    username: root
+    password: root
+    url: jdbc:mysql://localhost:3309/employeesmanagement?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 200MB
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: true
+    time-zone: GMT+8
+server:
+  port: 1234
+mybatis:
+  mapper-locations: classpath*:mapper/*.xml
+  type-aliases-package: com.design.employeesmanagement.pojo
+  configuration:
+    map-underscore-to-camel-case: true

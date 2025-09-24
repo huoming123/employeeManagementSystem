@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.employeesManagement.mapper.SalaryTimeMapper">
+
+    <resultMap type="com.design.employeesManagement.pojo.SalaryTime" id="SalaryTimeMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="time" column="time" jdbcType="TIMESTAMP"/>
+        <collection property="attendances" columnPrefix="at_" resultMap="AttendanceMap"/>
+    </resultMap>
+    <resultMap type="com.design.employeesManagement.pojo.Attendance" id="AttendanceMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="date" column="date" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="userName" column="user_name" jdbcType="VARCHAR"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
+        <result property="signOutAt" column="sign_out_at" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+
+    <!--  根据时间查询  -->
+    <select id="getTimeListByCondition" resultMap="SalaryTimeMap">
+        select id,
+        time
+        from salary_time
+        <!-- where  time >= #{page.startTime} AND   time <= #{page.endTime}  and time=#{page.startTime} and time=#{page.endTime}-->
+        where
+        time BETWEEN #{page.startTime} AND #{page.endTime}
+    </select>
+    <!--查询单个-->
+    <select id="queryById" resultMap="SalaryTimeMap">
+        select id,
+               time
+        from salary_time
+        where id = #{id}
+    </select>
+
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into salary_time(time)
+        values (#{time})
+    </insert>
+    <!--用select进行分页查询-->
+    <select id="getPageListByCondition" resultMap="SalaryTimeMap">
+        <!-- <if test="page.key.userName != null and page.key.userName != ''">
+             and  a.user_name like '%' #{page.key.userName}  '%'
+         </if>
+         <if test="page.key.year != null ">
+             <bind name="pattern" value="'%' + page.key.year + '%'" />
+             and a.created_at like #{pattern}
+         </if>-->
+        select * from salary_time
+        <!--排序 desc是降序-->
+        order by
+        id desc
+        <!--分页查询-->
+
+        limit #{page.startNum} , #{page.pageSize}
+    </select>
+    <!--分页查询条数-->
+    <select id="getPageListCount" resultType="int">
+        select count(id) as count
+        from salary_time
+    </select>
+
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update salary_time
+        <set>
+            <if test="time != null">
+                time = #{time},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from salary_time
+        where id = #{id}
+    </delete>
+
+
+    <!--批量添加时间-->
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into salary_time (time)
+        values
+        <foreach collection="entities" item="entitie" separator=",">
+            (#{entitie.time})
+        </foreach>
+    </insert>
+    <!--    #         on duplicate key update-->
+    <!--    #         time = values(time),-->
+    <!--根据时间查询单个-->
+    <select id="queryByTime" resultMap="SalaryTimeMap">
+        select id,
+               time
+        from salary_time
+        where time = #{time}
+    </select>
+
+    <!--根据时间查询单个-->
+    <select id="clockRecord" resultMap="SalaryTimeMap">
+        SELECT st.*,
+               at.id          as at_id,
+               at.date        as at_date,
+               at.user_id     as at_user_id,
+               at.user_name   as at_user_name,
+               at.status      as at_status,
+               at.created_at  as at_created_at,
+               at.sign_out_at as at_sign_out_at
+        FROM salary_time st
+                 LEFT JOIN attendance at ON at.date = st.id
+            AND at.user_id = #{page.userId}
+        WHERE DATE_FORMAT(time, '%Y%m') = DATE_FORMAT(#{page.sameTime}, '%Y%m');
+    </select>
+
+      <select id="getByDate" resultMap="SalaryTimeMap">
+          select * from salary_time where time like '%' #{dateStr} '%';
+      </select>
+</mapper>
+

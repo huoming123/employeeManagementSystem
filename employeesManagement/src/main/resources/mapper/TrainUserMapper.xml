@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.employeesManagement.mapper.TrainUserMapper">
+
+    <resultMap type="com.design.employeesManagement.pojo.TrainUser" id="TrainUserMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="trainId" column="train_id" jdbcType="INTEGER"/>
+        <result property="trainingTitle" column="training_title" jdbcType="VARCHAR"/>
+        <result property="trainingTime" column="training_time" jdbcType="TIMESTAMP"/>
+        <result property="trainingProgram" column="training_program" jdbcType="VARCHAR"/>
+        <result property="userName" column="user_name" jdbcType="VARCHAR"/>
+        <result property="trainingExpenses" column="training_expenses" jdbcType="INTEGER"/>
+        <result property="trainUserId" column="train_user_id" jdbcType="INTEGER"/>
+        <collection property="train" columnPrefix="t_" resultMap="TrainMap"/>
+    </resultMap>
+    <resultMap type="com.design.employeesManagement.pojo.Train" id="TrainMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="trainingTitle" column="training_title" jdbcType="VARCHAR"/>
+        <result property="trainingTime" column="training_time" jdbcType="TIMESTAMP"/>
+        <result property="trainingProgram" column="training_program" jdbcType="VARCHAR"/>
+        <result property="trainingExpenses" column="training_expenses" jdbcType="INTEGER"/>
+    </resultMap>
+    <!--查询单个-->
+    <select id="queryById" resultMap="TrainUserMap">
+        select id,
+               user_id,
+               train_id
+        from train_user
+        where id = #{id}
+    </select>
+
+    <!--  查询UserId 和 TrainId 判断是否有预约 -->
+    <select id="queryUserIdAndTrainId" resultMap="TrainUserMap">
+        select id,
+               user_id,
+               train_id
+        from train_user
+        where user_id = #{userId}
+          and train_id = #{trainId}
+    </select>
+
+    <!--  查询全部全部数据  -->
+    <select id="queryAllTrain" resultMap="TrainUserMap">
+        select b.*,c.user_name,a.id as train_user_id from train_user a,train b, users c where a.user_id=c.id and b.id=a.train_id
+        <!--员工搜索搜索 不为空 则进入搜索条件-->
+        <if test="userId != null">
+            and c.id = #{userId}
+        </if>
+        <if test="trainId != null">
+            and a.train_id = #{trainId}
+        </if>
+    </select>
+
+    <!--分页查询条数-->
+    <select id="getPageListCountAll" resultType="int">
+        select count(tu.id) as count
+        from train_user tu
+                 left join train t on tu.train_id = t.id
+        where user_id = #{page.key.userId}
+    </select>
+
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into train_user(user_id, train_id)
+        values (#{userId}, #{trainId})
+    </insert>
+    <!--用select进行分页查询-->
+    <select id="getPageListByCondition" resultMap="TrainUserMap">
+        select b.*,c.user_name from train_user a,train b, users c where a.uesr_id=c.id and b.id=a.train_id
+        <!--员工搜索搜索 不为空 则进入搜索条件-->
+        <if test="page.key.userId != null and page.key.userId != ''">
+            and c.user_id = #{page.key.userId}
+        </if>
+        <!--排序 desc是降序-->
+        order by
+        id desc
+        <!--分页查询-->
+
+        limit #{page.startNum} , #{page.pageSize}
+    </select>
+    <!--分页查询条数-->
+    <select id="getPageListCount" resultType="int">
+        select count(id) as count
+        from train_user from train_user a,train b, users c where a.uesr_id=c.id and b.id=a.train_id
+        <!--员工搜索搜索 不为空 则进入搜索条件-->
+        <if test="page.key.userId != null and page.key.userId != ''">
+            and c.user_id = #{page.key.userId}
+        </if>
+    </select>
+
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update train_user
+        <set>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="trainId != null">
+                train_id = #{trainId},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from train_user
+        where id = #{id}
+    </delete>
+
+</mapper>
+

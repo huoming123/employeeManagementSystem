@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.employeesManagement.mapper.LeaveApplicationMapper">
+
+    <resultMap type="com.design.employeesManagement.pojo.LeaveApplication" id="LeaveApplicationMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="startDate" column="start_date" jdbcType="TIMESTAMP"/>
+        <result property="endDate" column="end_date" jdbcType="TIMESTAMP"/>
+        <result property="createdBy" column="created_by" jdbcType="VARCHAR"/>
+        <result property="startTime" column="start_time" jdbcType="VARCHAR"/>
+        <result property="endTime" column="end_time" jdbcType="VARCHAR"/>
+        <result property="reason" column="reason" jdbcType="VARCHAR"/>
+        <result property="checked" column="checked" jdbcType="INTEGER"/>
+        <result property="checkedBy" column="checked_by" jdbcType="VARCHAR"/>
+        <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
+        <result property="days" column="days" jdbcType="INTEGER"/>
+        <result property="hours" column="hours" jdbcType="INTEGER"/>
+        <result property="deletedAt" column="deleted_at" jdbcType="TIMESTAMP"/>
+        <result property="type" column="type" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="LeaveApplicationMap">
+        select id,
+               start_date,
+               end_date,
+               created_by,
+               start_time,
+               end_time,
+               reason,
+               checked,
+               checked_by,
+               created_at,
+               days,
+               hours,
+               deleted_at
+        from leave_application
+        where id = #{id}
+    </select>
+
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into leave_application(start_date, end_date, created_by, start_time, end_time, reason, checked,
+                                      checked_by, created_at, days, hours, deleted_at)
+        values (#{startDate}, #{endDate}, #{createdBy}, #{startTime}, #{endTime}, #{reason}, 0, #{checkedBy}, now(),
+                #{days}, #{hours}, #{deletedAt})
+    </insert>
+    <!--用select进行分页查询-->
+    <select id="getPageListByCondition" resultMap="LeaveApplicationMap">
+        select * from leave_application where id is not null
+
+        <if test="page.key.createdBy != null and page.key.createdBy != ''">
+            and created_by = #{page.key.createdBy}
+        </if>
+
+        <if test="page.key.checked != null and page.key.checked != ''">
+            and checked = #{page.key.checked}
+        </if>
+        <if test="page.key.checked == 0">
+            and checked = #{page.key.checked}
+        </if>
+        <!--排序 desc是降序-->
+        order by
+        created_at desc
+        <!--分页查询-->
+        limit #{page.startNum} , #{page.pageSize}
+    </select>
+    <!--分页查询条数-->
+    <select id="getPageListCount" resultType="int">
+        select count(id) as count
+        from leave_application
+    </select>
+
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update leave_application
+        <set>
+            <if test="startDate != null">
+                start_date = #{startDate},
+            </if>
+            <if test="endDate != null">
+                end_date = #{endDate},
+            </if>
+            <if test="createdBy != null and createdBy != ''">
+                created_by = #{createdBy},
+            </if>
+            <if test="startTime != null and startTime != ''">
+                start_time = #{startTime},
+            </if>
+            <if test="endTime != null and endTime != ''">
+                end_time = #{endTime},
+            </if>
+            <if test="reason != null and reason != ''">
+            reason = #{reason},
+             </if>
+            <if test="type != null and type != ''">
+                type = #{type},
+            </if>
+            <if test="checked != null">
+                checked = #{checked},
+            </if>
+                checked_by = 'admin',
+
+            <if test="createdAt != null">
+                created_at = #{createdAt},
+            </if>
+            <if test="days != null">
+                days = #{days},
+            </if>
+            <if test="hours != null">
+                hours = #{hours},
+            </if>
+            <if test="deletedAt != null">
+                deleted_at = #{deletedAt},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from leave_application
+        where id = #{id}
+    </delete>
+
+</mapper>
+

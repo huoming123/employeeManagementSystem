@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.employeesManagement.mapper.AttendanceMapper">
+
+    <resultMap type="com.design.employeesManagement.pojo.Attendance" id="AttendanceMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="date" column="date" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="userName" column="user_name" jdbcType="VARCHAR"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
+        <result property="signOutAt" column="sign_out_at" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="AttendanceMap">
+        select id,
+               date,
+               user_id,
+               user_name,
+               status,
+               created_at,
+               sign_out_at
+        from attendance
+        where id = #{id}
+    </select>
+
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into attendance(date, user_id, user_name, status, created_at, sign_out_at)
+        values (#{date}, #{userId}, #{userName}, #{status}, #{createdAt}, #{signOutAt})
+    </insert>
+    <!--用select进行分页查询-->
+    <select id="getPageListByCondition" resultMap="AttendanceMap">
+        <!-- <if test="page.key.userName != null and page.key.userName != ''">
+             and  a.user_name like '%' #{page.key.userName}  '%'
+         </if>
+         <if test="page.key.year != null ">
+             <bind name="pattern" value="'%' + page.key.year + '%'" />
+             and a.created_at like #{pattern}
+         </if>-->
+        select * from attendance
+        <!--排序 desc是降序-->
+        order by
+        created_at desc
+        <!--分页查询-->
+
+        limit #{page.startNum} , #{page.pageSize}
+    </select>
+    <!--分页查询条数-->
+    <select id="getPageListCount" resultType="int">
+        select count(id) as count
+        from attendance
+    </select>
+
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update attendance
+        <set>
+            <if test="date != null">
+                date = #{date},
+            </if>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="userName != null and userName != ''">
+                user_name = #{userName},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="createdAt != null">
+                created_at = #{createdAt},
+            </if>
+            <if test="signOutAt != null">
+                sign_out_at = #{signOutAt},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from attendance
+        where id = #{id}
+    </delete>
+
+
+    <!--新增所有列-->
+    <insert id="clockIn" keyProperty="id" useGeneratedKeys="true">
+        insert into attendance(date, user_id, user_name, status, created_at, sign_out_at)
+        values (#{date}, #{userId}, #{userName}, #{status}, #{createdAt}, #{signOutAt})
+    </insert>
+
+    <!--查询单个-->
+    <select id="queryByUserIdTime" resultMap="AttendanceMap">
+        select id,
+               date,
+               user_id,
+               user_name,
+               status,
+               created_at,
+               sign_out_at
+        from attendance
+        where user_id = #{userId}
+          and date = #{date}
+    </select>
+
+
+</mapper>
+

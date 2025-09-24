@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.employeesManagement.mapper.UsersMapper">
+
+    <resultMap type="com.design.employeesManagement.pojo.Users" id="UsersMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="telephone" column="telephone" jdbcType="VARCHAR"/>
+        <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
+        <result property="userName" column="user_name" jdbcType="VARCHAR"/>
+        <result property="cardId" column="card_id" jdbcType="VARCHAR"/>
+        <result property="age" column="age" jdbcType="INTEGER"/>
+        <result property="sex" column="sex" jdbcType="VARCHAR"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="nation" column="nation" jdbcType="VARCHAR"/>
+        <result property="birthday" column="birthday" jdbcType="TIMESTAMP"/>
+        <result property="nativePlace" column="native_place" jdbcType="VARCHAR"/>
+        <result property="maritalStatus" column="marital_status" jdbcType="VARCHAR"/>
+        <result property="political" column="political" jdbcType="VARCHAR"/>
+        <result property="createdBy" column="created_by" jdbcType="VARCHAR"/>
+        <result property="userNo" column="user_no" jdbcType="VARCHAR"/>
+        <result property="role" column="role" jdbcType="VARCHAR"/>
+        <result property="images" column="images" jdbcType="VARCHAR"/>
+        <result property="startAt" column="start_at" jdbcType="TIMESTAMP"/>
+        <result property="leaveAt" column="leave_at" jdbcType="TIMESTAMP"/>
+        <result property="depart" column="depart" jdbcType="VARCHAR"/>
+        <result property="ranks" column="ranks" jdbcType="VARCHAR"/>
+        <result property="education" column="education" jdbcType="VARCHAR"/>
+        <result property="excellent" column="excellent" jdbcType="VARCHAR"/>
+        <result property="email" column="email" jdbcType="VARCHAR"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="UsersMap">
+        select *
+        from users
+        where id = #{id}
+    </select>
+
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into users(password, telephone, created_at, user_name, card_id, age, sex, address, nation, birthday,
+                          native_place, marital_status, political, created_by, user_no, role, images, start_at,
+                          leave_at, depart, ranks,
+                          education, excellent, email, status)
+        values (#{password}, #{telephone}, now(), #{userName}, #{cardId}, #{age}, #{sex}, #{address}, #{nation},
+                #{birthday}, #{nativePlace}, #{maritalStatus}, #{political}, #{createdBy}, #{userNo}, #{role},
+                #{images},
+                #{startAt}, #{leaveAt}, #{depart}, #{ranks}, #{education}, 0, #{email}, 1)
+    </insert>
+    <!--用select进行分页查询-->
+    <select id="getPageListByCondition" resultMap="UsersMap">
+        select * from users where created_at is not null
+        <!--角色搜索 不为空 则进入搜索条件-->
+        <if test="page.key.role != null and page.key.role != ''">
+            and role = #{page.key.role}
+        </if>
+        <!--用户名搜索 不为空 则进入搜索条件-->
+        <if test="page.key.userName != null and page.key.userName != ''">
+            and user_name like '%' #{page.key.userName} '%'
+        </if>
+        <!--身份证搜索 不为空 则进入搜索条件-->
+        <if test="page.key.cardId != null and page.key.cardId != ''">
+            and card_id like '%' #{page.key.cardId} '%'
+        </if>
+        <!--部门搜索 不为空 则进入搜索条件-->
+        <if test="page.key.depart != null and page.key.depart != ''">
+            and depart = #{page.key.depart}
+        </if>
+        <!--状态搜索 不为空 则进入搜索条件-->
+        <if test="page.key.status != null">
+            and status = #{page.key.status}
+        </if>
+        <!--手机号码搜索 不为空 则进入搜索条件-->
+        <if test="page.key.telephone != null and page.key.telephone != ''">
+            and telephone like '%' #{page.key.telephone} '%'
+        </if>
+        <!--排序 desc是降序-->
+        order by
+        created_at desc
+        <!--分页查询-->
+
+        limit #{page.startNum} , #{page.pageSize}
+    </select>
+    <!--分页查询条数-->
+    <select id="getPageListCount" resultType="int">
+        select count(id) as count from users where created_at is not null
+        <!--角色搜索 不为空 则进入搜索条件-->
+        <if test="page.key.role != null and page.key.role != ''">
+            and role = #{page.key.role}
+        </if>
+        <!--用户名搜索 不为空 则进入搜索条件-->
+        <if test="page.key.userName != null and page.key.userName != ''">
+            and user_name like '%' #{page.key.userName} '%'
+        </if>
+        <!--身份证搜索 不为空 则进入搜索条件-->
+        <if test="page.key.cardId != null and page.key.cardId != ''">
+            and card_id like '%' #{page.key.cardId} '%'
+        </if>
+        <!--部门搜索 不为空 则进入搜索条件-->
+        <if test="page.key.depart != null and page.key.depart != ''">
+            and depart = #{page.key.depart}
+        </if>
+        <!--状态搜索 不为空 则进入搜索条件-->
+        <if test="page.key.status != null">
+            and status = #{page.key.status}
+        </if>
+        <!--手机号码搜索 不为空 则进入搜索条件-->
+        <if test="page.key.telephone != null and page.key.telephone != ''">
+            and telephone like '%' #{page.key.telephone} '%'
+        </if>
+    </select>
+
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update users
+        <set>
+            <if test="password != null and password != ''">
+                password = #{password},
+            </if>
+            <if test="telephone != null and telephone != ''">
+                telephone = #{telephone},
+            </if>
+            <if test="createdAt != null">
+                created_at = #{createdAt},
+            </if>
+            <if test="userName != null and userName != ''">
+                user_name = #{userName},
+            </if>
+            <if test="cardId != null and cardId != ''">
+                card_id = #{cardId},
+            </if>
+            <if test="age != null">
+                age = #{age},
+            </if>
+            <if test="sex != null and sex != ''">
+                sex = #{sex},
+            </if>
+            <if test="address != null and address != ''">
+                address = #{address},
+            </if>
+            <if test="nation != null and nation != ''">
+                nation = #{nation},
+            </if>
+            <if test="birthday != null">
+                birthday = #{birthday},
+            </if>
+            <if test="nativePlace != null and nativePlace != ''">
+                native_place = #{nativePlace},
+            </if>
+            <if test="maritalStatus != null and maritalStatus != ''">
+                marital_status = #{maritalStatus},
+            </if>
+            <if test="political != null and political != ''">
+                political = #{political},
+            </if>
+            <if test="createdBy != null and createdBy != ''">
+                created_by = #{createdBy},
+            </if>
+            <if test="userNo != null and userNo != ''">
+                user_no = #{userNo},
+            </if>
+            <if test="role != null and role != ''">
+                role = #{role},
+            </if>
+            <if test="images != null and images != ''">
+                images = #{images},
+            </if>
+            <if test="startAt != null">
+                start_at = #{startAt},
+            </if>
+            <if test="leaveAt != null">
+                leave_at = #{leaveAt},
+            </if>
+            <if test="depart != null and depart != ''">
+                depart = #{depart},
+            </if>
+            <if test="ranks != null and ranks != ''">
+                ranks = #{ranks},
+            </if>
+            <if test="education != null and education != ''">
+                education = #{education},
+            </if>
+            <if test="excellent != null and excellent != ''">
+                excellent = #{excellent},
+            </if>
+            <if test="email != null and email != ''">
+                email = #{email},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from users
+        where id = #{id}
+    </delete>
+    <!--根据员工编号查询数据-->
+    <select id="getByUserNoAndRole" resultMap="UsersMap">
+        select *
+        from users
+        where user_no = #{userNo}
+          and role = #{role}
+          and status = 1;
+    </select>
+    <select id="getManagerList" resultMap="UsersMap">
+        select *
+        from users
+        where role = '部门经理'
+          and status = 1;
+    </select>
+
+    <select id="getByUserNo" resultMap="UsersMap">
+         select * from users where user_no=#{userNo};
+     </select>
+</mapper>
+

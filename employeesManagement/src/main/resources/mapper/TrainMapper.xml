@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.employeesManagement.mapper.TrainMapper">
+
+    <resultMap type="com.design.employeesManagement.pojo.Train" id="TrainMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="trainingTitle" column="training_title" jdbcType="VARCHAR"/>
+        <result property="trainingTime" column="training_time" jdbcType="TIMESTAMP"/>
+        <result property="trainingProgram" column="training_program" jdbcType="VARCHAR"/>
+        <result property="trainingExpenses" column="training_expenses" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="TrainMap">
+        select
+          id, training_title, training_time, training_program, training_expenses
+        from train
+        where id = #{id}
+    </select>
+
+
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into train(training_title, training_time, training_program, training_expenses)
+        values (#{trainingTitle}, #{trainingTime}, #{trainingProgram}, #{trainingExpenses})
+    </insert>
+        <!--用select进行分页查询-->
+      <select id="getPageListByCondition" resultMap="TrainMap">
+        select *  from train
+            <!--排序 desc是降序-->
+        order by
+        id desc
+        <!--分页查询-->
+      
+        limit  #{page.startNum} , #{page.pageSize}
+    </select>
+     <!--分页查询条数-->
+    <select id="getPageListCount" resultType="int">
+        select count(id) as count from train
+    </select>
+
+   
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update train
+        <set>
+            <if test="trainingTitle != null and trainingTitle != ''">
+                training_title = #{trainingTitle},
+            </if>
+            <if test="trainingTime != null">
+                training_time = #{trainingTime},
+            </if>
+            <if test="trainingProgram != null and trainingProgram != ''">
+                training_program = #{trainingProgram},
+            </if>
+            <if test="trainingExpenses != null">
+                training_expenses = #{trainingExpenses},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from train where id = #{id}
+    </delete>
+
+</mapper>
+

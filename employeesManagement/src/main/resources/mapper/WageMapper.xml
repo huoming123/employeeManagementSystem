@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.employeesManagement.mapper.WageMapper">
+
+    <resultMap type="com.design.employeesManagement.pojo.Wage" id="WageMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="month" column="month" jdbcType="TIMESTAMP"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="attendanceHour" column="attendance_hour" jdbcType="INTEGER"/>
+        <result property="basePay" column="base_pay" jdbcType="INTEGER"/>
+        <result property="bonus" column="bonus" jdbcType="INTEGER"/>
+        <result property="weal" column="weal" jdbcType="INTEGER"/>
+        <result property="wageTotal" column="wage_total" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="WageMap">
+        select id,
+               month,
+               user_id,
+               attendance_hour,
+               base_pay,
+               bonus,
+               weal,
+               wage_total
+        from wage
+        where id = #{id}
+    </select>
+
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into wage(month, user_id, attendance_hour, base_pay, bonus, weal, wage_total)
+        values (#{month}, #{userId}, #{attendanceHour}, #{basePay}, #{bonus}, #{weal}, #{wageTotal})
+    </insert>
+    <!--用select进行分页查询-->
+    <select id="getPageListByCondition" resultMap="WageMap">
+        <!-- <if test="page.key.userName != null and page.key.userName != ''">
+             and  a.user_name like '%' #{page.key.userName}  '%'
+         </if>
+         <if test="page.key.year != null ">
+             <bind name="pattern" value="'%' + page.key.year + '%'" />
+             and a.created_at like #{pattern}
+         </if>-->
+        select * from wage
+        <!--排序 desc是降序-->
+        order by
+        created_at desc
+        <!--分页查询-->
+
+        limit #{page.startNum} , #{page.pageSize}
+    </select>
+    <!--分页查询条数-->
+    <select id="getPageListCount" resultType="int">
+        select count(id) as count
+        from wage
+    </select>
+
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update wage
+        <set>
+            <if test="month != null">
+                month = #{month},
+            </if>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="attendanceHour != null">
+                attendance_hour = #{attendanceHour},
+            </if>
+            <if test="basePay != null">
+                base_pay = #{basePay},
+            </if>
+            <if test="bonus != null">
+                bonus = #{bonus},
+            </if>
+            <if test="weal != null">
+                weal = #{weal},
+            </if>
+            <if test="wageTotal != null">
+                wage_total = #{wageTotal},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from wage
+        where id = #{id}
+    </delete>
+
+
+    <!--查询单个-->
+    <select id="getUserAndMonth" resultMap="WageMap">
+        select id,
+               month,
+               user_id,
+               attendance_hour,
+               base_pay,
+               bonus,
+               weal,
+               wage_total
+        from wage
+        where user_id = #{userId}
+          and  DATE_FORMAT(month, '%Y%m') = DATE_FORMAT(#{month}, '%Y%m');
+    </select>
+
+
+</mapper>
+
